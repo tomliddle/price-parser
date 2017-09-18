@@ -3,6 +3,8 @@ package example
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+import scala.util.Try
+
 
 object Prices {
 
@@ -25,11 +27,17 @@ object Prices {
     * @param ticker e.g. GOOG
     * @return Seq of tuple containing Date and Price
     */
-  def dailyPrices(ticker: String): Seq[(LocalDate, Double)] = {
-    scala.io.Source.fromURL(pricesURL(ticker)).getLines.drop(1).map { l =>
+  def dailyPrices(ticker: String): List[(LocalDate, Double)] = {
+    val src = scala.io.Source.fromURL(pricesURL(ticker))
+
+    val res = src.getLines.drop(1).map { l =>
       val t = l.split(",")
       (LocalDate.parse(t(0), formatter), t(4).toDouble)
-    }.toSeq
+    }.toList
+
+    src.close()
+
+    res
   }
 
 
