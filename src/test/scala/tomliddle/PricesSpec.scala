@@ -1,7 +1,4 @@
-package example
-
-import java.io.IOException
-import java.time.LocalDate
+package tomliddle
 
 import org.scalatest._
 
@@ -60,26 +57,6 @@ class PricesSpec extends FlatSpec with Matchers {
 
     // Should be able to calculate a mean return
     mean.isDefined should be(false)
-  }
-
-  "PriceListParser" should "parse a list of data" in {
-    val p = new PriceListParser {}
-
-    val prices = List(
-      "Date,Open,High,Low,Close,Volume",
-      "15-Sep-17,924.66,926.49,916.36,920.29,2505430",
-      "14-Sep-17,931.25,932.77,924.00,925.11,1397644",
-      "13-Sep-17,930.66,937.25,929.86,935.09,1102631",
-      "12-Sep-17,932.59,933.48,923.86,932.07,1134397"
-    )
-
-    val parsedPrices = p.parsePrices(prices)
-
-    parsedPrices.size should be(4)
-
-    parsedPrices.head._1 should be(LocalDate.of(2017, 9, 15))
-
-    parsedPrices.head._2 should be(920.29)
   }
 
 }
