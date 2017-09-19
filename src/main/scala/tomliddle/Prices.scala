@@ -37,7 +37,7 @@ object Prices extends PriceListUtilities {
         parsePrices(s.getLines.toList)
 
       case Failure(f) =>
-        logger.info(s"Failed to get prices: {}", f.getMessage)
+        logger.warn(s"Failed to get prices: {}", f.getMessage)
         List[(LocalDate, Double)]()
     }
 
