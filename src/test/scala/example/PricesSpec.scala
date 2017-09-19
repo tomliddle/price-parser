@@ -6,18 +6,32 @@ import org.scalatest._
 
 class PricesSpec extends FlatSpec with Matchers {
 
-  "The Prices object" should "get the historic prices" in {
+  "The daily prices method" should "get the historic prices" in {
 
     val prices =  Prices.dailyPrices("GOOG")
 
     prices.size should be >= 250
   }
 
-  it should "throw an exception when getting a wrong ticker" in {
+  it should "return an empty list when getting a wrong ticker" in {
 
-    assertThrows[IOException] { // Result type: Assertion
-      Prices.dailyPrices("WRONG-TICKER")
-    }
+    val prices =  Prices.dailyPrices("WRONG-TICKER")
+
+    prices.size should be(0)
+  }
+
+  it should "return an empty list when getting an empty string param" in {
+
+    val prices =  Prices.dailyPrices("")
+
+    prices.size should be(0)
+  }
+
+  "The returns method" should "get the returns" in {
+
+    val rets = Prices.returns("")
+
+    rets.size should be >= 250
   }
 
 
