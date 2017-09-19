@@ -4,10 +4,10 @@ import java.time.LocalDate
 
 import org.scalatest.{FlatSpec, Matchers}
 
-class PriceListParserSpec extends FlatSpec with Matchers {
+class PriceListUtilitiesSpec extends FlatSpec with Matchers {
 
   "PriceListParser parsePrices" should "parse a list of data" in {
-    val p = new PriceListParser {}
+    val p = new PriceListUtilities {}
 
     val prices = List(
       "Date,Open,High,Low,Close,Volume",
@@ -28,7 +28,7 @@ class PriceListParserSpec extends FlatSpec with Matchers {
 
   // Test for bad data. There isn't much we can do here if the api isn't returning correct data so ensure an exception is thrown
   it should "throw an ArrayIndexOutOfBoundsException if the data is malformed" in {
-    val p = new PriceListParser {}
+    val p = new PriceListUtilities {}
 
     val prices = List(
       "Date,Open,High,Low,Close,Volume",
@@ -44,7 +44,7 @@ class PriceListParserSpec extends FlatSpec with Matchers {
   }
 
   "PriceListParser calculateReturn" should "calculate the correct return" in {
-    val p = new PriceListParser {}
+    val p = new PriceListUtilities {}
 
     val prices = List(
       "Date,Open,High,Low,Close,Volume",
@@ -66,7 +66,7 @@ class PriceListParserSpec extends FlatSpec with Matchers {
   }
 
   "PriceListParser mean" should "calculate the mean" in {
-    val p = new PriceListParser {}
+    val p = new PriceListUtilities {}
 
     val returns = List(
       (LocalDate.of(2017, 9, 15), 2.0),
@@ -84,7 +84,7 @@ class PriceListParserSpec extends FlatSpec with Matchers {
   }
 
   it should "return None with no vaules to calculate" in {
-    val p = new PriceListParser {}
+    val p = new PriceListUtilities {}
 
     val ret = p.mean(List[(LocalDate, Double)]())
 
@@ -93,7 +93,7 @@ class PriceListParserSpec extends FlatSpec with Matchers {
   }
 
   it should "calculate with one value" in {
-    val p = new PriceListParser {}
+    val p = new PriceListUtilities {}
 
     val returns = List(
       (LocalDate.of(2017, 9, 15), 2.0)
