@@ -9,6 +9,7 @@ lazy val root = (project in file(".")).
     )),
     name := "Hello",
     libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.2.3",
+    libraryDependencies += "com.typesafe.scala-logging" % "scala-logging_2.11" % "3.7.2",
     libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.3" % Test
 
   )

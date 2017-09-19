@@ -6,7 +6,7 @@ import org.scalatest._
 
 class PricesSpec extends FlatSpec with Matchers {
 
-  "The daily prices method" should "get the historic prices" in {
+  "The daily prices method" should "get the historic prices for GOOG" in {
 
     val prices =  Prices.dailyPrices("GOOG")
 
@@ -27,11 +27,18 @@ class PricesSpec extends FlatSpec with Matchers {
     prices.size should be(0)
   }
 
-  "The returns method" should "get the returns" in {
+  "The returns method" should "get the returns for GOOG" in {
+
+    val rets = Prices.returns("GOOG")
+
+    rets.size should be >= 250
+  }
+
+  it should "get an empty list given a wrong ticker" in {
 
     val rets = Prices.returns("")
 
-    rets.size should be >= 250
+    rets.size should be(0)
   }
 
 

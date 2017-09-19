@@ -2,9 +2,14 @@ package example
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+
+import com.typesafe.scalalogging.Logger
+
 import scala.util.{Failure, Success, Try}
 
 object Prices {
+
+  private val logger = Logger("prices")
 
   // Format is 9-Aug-17
   private final val formatter = DateTimeFormatter.ofPattern("d-MMM-yy")
@@ -33,6 +38,7 @@ object Prices {
           (LocalDate.parse(t(0), formatter), t(4).toDouble)
         }.toList
       case Failure(f) =>
+        logger.info(s"Failed to get prices: {}", f.getMessage)
         List[(LocalDate, Double)]()
     }
 
