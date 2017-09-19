@@ -41,6 +41,26 @@ class PricesSpec extends FlatSpec with Matchers {
     rets.size should be(0)
   }
 
+  "The mean return method" should "get the mean return for GOOG" in {
+
+    val mean = Prices.meanReturn("GOOG")
+
+    // Should be able to calculate a mean return
+    mean.isDefined should be(true)
+
+    // As using live data it is reasonable to assume the avg return will never exceed -100% or 100% a day.
+    mean.get should be <= 1.0
+    mean.get should be >= -1.0
+  }
+
+  it should "return None when given a bad ticker" in {
+
+    val mean = Prices.meanReturn("WRONG TICKER")
+
+    // Should be able to calculate a mean return
+    mean.isDefined should be(false)
+  }
+
 
 
 }

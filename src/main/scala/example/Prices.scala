@@ -33,8 +33,10 @@ object Prices {
 
     val res = src match {
       case Success(s) =>
+        // Drop first line headers
         s.getLines.drop(1).map { l =>
           val t = l.split(",")
+          // Get the date from idx 0 and close price from idx 4
           (LocalDate.parse(t(0), formatter), t(4).toDouble)
         }.toList
       case Failure(f) =>
@@ -55,8 +57,13 @@ object Prices {
   def returns(ticker: String): List[(LocalDate, Double)] = {
     val dP = dailyPrices(ticker)
 
+    // An empty list cannot compute any return as we need prev price so check for this
+    // A list with one element will still return an empty list as we fold over the tail anyhow
+    // (as we need at least 2 elements to calculate a value)
     if (dP.nonEmpty)
+      // FoldLeft stores a list of the results and the previous price
       dP.tail.foldLeft(List[(LocalDate, Double)](), dP.head._2) { (acc, curr) =>
+        // Calculate the daily return: (curr price - prev price) / prev price
         val ret = (curr._2 - acc._2) / acc._2
         ((curr._1, ret) :: acc._1, curr._2)
       }._1
@@ -65,11 +72,18 @@ object Prices {
 
 
 
-  /* 3 – 1 year mean returns */
 
-  /*def meanReturn(ticker:String): Double = {
-
-  }*/
+  /**
+    * 3 – 1 year mean returns
+    * @param ticker e.g. GOOG
+    * @return Option of mean return. If no data then will return None
+    */
+  def meanReturn(ticker:String): Option[Double] = {
+    val ret = returns(ticker)
+    // take the second parameter of the returns value (i.e. the return) and sum. Divide by size to get mean return.
+    if (ret.nonEmpty) Some(ret.map(_._2).sum / ret.size)
+    else None
+  }
 
 }
 
