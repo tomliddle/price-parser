@@ -56,8 +56,7 @@ object Prices extends PriceListParser {
   def meanReturn(ticker:String): Option[Double] = {
     val ret = returns(ticker)
     // take the second parameter of the returns value (i.e. the return) and sum. Divide by size to get mean return.
-    if (ret.nonEmpty) Some(ret.map(_._2).sum / ret.size)
-    else None
+    mean(ret)
   }
 
 }
@@ -92,15 +91,21 @@ trait PriceListParser {
     if (dailyPrices.nonEmpty) {
       val dPSorted = dailyPrices.sorted
       // FoldLeft stores a list of the results and the previous price
-      // We reverse as putting the result on the head of the list
+      // We reverse the list to order by date as we appended to front of list.
       // Take the tail as we cannot determine the return on the first days data
-      dPSorted.tail.reverse.foldLeft(List[(LocalDate, Double)](), dPSorted.head._2) { (acc, curr) =>
+      dPSorted.tail.foldLeft(List[(LocalDate, Double)](), dPSorted.head._2) { (acc, curr) =>
         // Calculate the daily return: (curr price - prev price) / prev price
         val ret = (curr._2 - acc._2) / acc._2
         ((curr._1, ret) :: acc._1, curr._2)
-      }._1
+      }._1.reverse
     }
     else List[(LocalDate, Double)]()
+  }
+
+
+  def mean(returns: List[(LocalDate, Double)]): Option[Double] = {
+    if (returns.nonEmpty) Some(returns.map(_._2).sum / returns.size)
+    else None
   }
 
 }
