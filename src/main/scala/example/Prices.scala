@@ -7,21 +7,11 @@ import com.typesafe.scalalogging.Logger
 
 import scala.util.{Failure, Success, Try}
 
-object Prices {
+object Prices extends PriceListParser {
 
   private val logger = Logger("prices")
 
-  // Format is 9-Aug-17
-  private final val formatter = DateTimeFormatter.ofPattern("d-MMM-yy")
-
   private def pricesURL(ticker: String): String = s"https://www.google.com/finance/historical?q=NASDAQ:$ticker&output=csv"
-
-
-  //Task
-
-  //Please write Scala functions that will return, feel free to adapt function signatures, these are just indicative. Use Close price everywhere:
-
-
 
   /**
     * 1 - 1 year historic prices given a ticker
@@ -34,11 +24,8 @@ object Prices {
     val res = src match {
       case Success(s) =>
         // Drop first line headers
-        s.getLines.drop(1).map { l =>
-          val t = l.split(",")
-          // Get the date from idx 0 and close price from idx 4
-          (LocalDate.parse(t(0), formatter), t(4).toDouble)
-        }.toList
+        parsePrices(s.getLines.toList)
+
       case Failure(f) =>
         logger.info(s"Failed to get prices: {}", f.getMessage)
         List[(LocalDate, Double)]()
@@ -57,21 +44,8 @@ object Prices {
   def returns(ticker: String): List[(LocalDate, Double)] = {
     val dP = dailyPrices(ticker)
 
-    // An empty list cannot compute any return as we need prev price so check for this
-    // A list with one element will still return an empty list as we fold over the tail anyhow
-    // (as we need at least 2 elements to calculate a value)
-    if (dP.nonEmpty)
-      // FoldLeft stores a list of the results and the previous price
-      dP.tail.foldLeft(List[(LocalDate, Double)](), dP.head._2) { (acc, curr) =>
-        // Calculate the daily return: (curr price - prev price) / prev price
-        val ret = (curr._2 - acc._2) / acc._2
-        ((curr._1, ret) :: acc._1, curr._2)
-      }._1
-    else List[(LocalDate, Double)]()
+    calculateReturn(dP)
   }
-
-
-
 
   /**
     * 3 – 1 year mean returns
@@ -83,6 +57,36 @@ object Prices {
     // take the second parameter of the returns value (i.e. the return) and sum. Divide by size to get mean return.
     if (ret.nonEmpty) Some(ret.map(_._2).sum / ret.size)
     else None
+  }
+
+}
+
+
+trait PriceListParser {
+
+  // Format is 9-Aug-17
+  private final val formatter = DateTimeFormatter.ofPattern("d-MMM-yy")
+
+  def parsePrices(prices: List[String]): List[(LocalDate, Double)] = {
+    prices.drop(1).map { l =>
+      val t = l.split(",")
+      // Get the date from idx 0 and close price from idx 4
+      (LocalDate.parse(t(0), formatter), t(4).toDouble)
+    }
+  }
+
+  def calculateReturn(dailyPrices: List[(LocalDate, Double)]): List[(LocalDate, Double)] = {
+    // An empty list cannot compute any return as we need prev price so check for this
+    // A list with one element will still return an empty list as we fold over the tail anyhow
+    // (as we need at least 2 elements to calculate a value)
+    if (dailyPrices.nonEmpty)
+    // FoldLeft stores a list of the results and the previous price
+      dailyPrices.tail.foldLeft(List[(LocalDate, Double)](), dailyPrices.head._2) { (acc, curr) =>
+        // Calculate the daily return: (curr price - prev price) / prev price
+        val ret = (curr._2 - acc._2) / acc._2
+        ((curr._1, ret) :: acc._1, curr._2)
+      }._1
+    else List[(LocalDate, Double)]()
   }
 
 }
